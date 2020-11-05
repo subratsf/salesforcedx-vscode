@@ -13,7 +13,10 @@ import * as vscode from 'vscode';
 export class QueryRunner {
   constructor(private connection: Connection) {}
 
-  public async runQuery(queryText: string): Promise<QueryResult<JsonMap>> {
+  public async runQuery(
+    queryText: string,
+    options = { showErrors: true }
+  ): Promise<QueryResult<JsonMap>> {
     try {
       const rawQueryData = (await this.connection.query(
         queryText
@@ -25,9 +28,9 @@ export class QueryRunner {
       return cleanQueryData;
     } catch (error) {
       // TODO: i18n
-      vscode.window.showErrorMessage(
-        `Your query contains invalid or incomplete syntax. Fix the syntax errors and try again.`
-      );
+      if (options.showErrors) {
+        vscode.window.showErrorMessage(error.message);
+      }
       throw error;
     }
   }
